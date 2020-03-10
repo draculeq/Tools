@@ -1,0 +1,16 @@
+{
+    "name": "Tools",
+    "references": [
+        "GUID:c98949a527975844a9472b02cd836458",
+        "GUID:e1466841b6aadaf4ead70552d3d409d0",
+        "GUID:a314a80aa24eb8d46b56280203137e3b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
