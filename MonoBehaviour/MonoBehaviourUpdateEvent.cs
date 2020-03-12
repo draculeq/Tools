@@ -1,10 +1,11 @@
 ﻿using Deadbit.Variables;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Deadbit.Tools
 {
-    public class MonoBehaviourUpdateEvent : MonoBehaviour
+    public class MonoBehaviourUpdateEvent : SerializedMonoBehaviour
     {
 #pragma warning disable 649
         [SerializeField] private UnityEvent onUpdated;
