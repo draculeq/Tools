@@ -16,12 +16,13 @@ namespace Deadbit.Tools
         [SerializeField] private UnityEvent downloadStarted;
         [SerializeField] public StringEvent downloadFailed;
         [SerializeField] public TextureEvent downloadSuceed;
-        private string lastUrl;
-        private Texture2D lastTexture;
+        [SerializeField] public string lastUrl;
+        [SerializeField] public Texture2D lastTexture;
 #pragma warning restore 649
-        public int Id { get; private set; }
+        public int Id => listenerId;
 
         DeadbitCache.TaskRequest request;
+        private int listenerId;
 
         [Button]
         public async void Download()
@@ -37,33 +38,49 @@ namespace Deadbit.Tools
 
         public async Task<Texture2D> DownloadTexture(string url)
         {
-            if (lastUrl == url)
+            if (lastUrl == url && lastTexture != null)
             {
                 OnSucceed(lastTexture);
                 return lastTexture;
             }
-
-            Id = Guid.NewGuid().GetHashCode();
+            if (lastTexture != null)
+            {
+                Destroy(lastTexture);
+            }
+            listenerId = Guid.NewGuid().GetHashCode();
             if (downloadStarted != null) downloadStarted.Invoke();
             request = await DeadbitCache.GetTexture(url, this);
-            if (request != null && request.Listeners != null && request.Listeners.Any(a => a == Id))
+            if (request != null)
             {
-                if (request.Task.Result.IsSuccess)
+                if (request.Listeners == null || request.Listeners.Count == 0)
                 {
-                    lastTexture = request.Task.Result.Texture;
-                    lastUrl = url;
-                    OnSucceed(request.Task.Result.Texture);
+                    if (request.Task != null && request.Task.Result != null && request.Task.Result.Texture != null)
+                    {
+                        Destroy(request.Task.Result.Texture);
+                    }
                 }
-                else
-                    OnFailed(request.Task.Result.Error);
-                return request.Task.Result.Texture;
+                else if (request.Listeners.Any(a => a == Id))
+                {
+                    if (request.Task.Result.IsSuccess)
+                    {
+                        lastTexture = request.Task.Result.Texture;
+                        lastUrl = url;
+                        OnSucceed(request.Task.Result.Texture);
+                    }
+                    else
+                        OnFailed(request.Task.Result.Error);
+                    return request.Task.Result.Texture;
+                }
             }
-
             return null;
         }
 
         void OnDisable()
         {
+            if (lastTexture != null)
+            {
+                Destroy(lastTexture);
+            }
             if (request != null) request.RemoveListener(this);
         }
 
